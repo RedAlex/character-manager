@@ -1,14 +1,24 @@
-local CURRENT_VERSION = GetResourceMetadata(GetCurrentResourceName(), 'version') or '0.0.0'
 local GITHUB_REPO = 'RedAlex/character-manager'
 local GITHUB_RELEASE_API = 'https://api.github.com/repos/' .. GITHUB_REPO .. '/releases/latest'
 local GITHUB_RELEASES_URL = 'https://github.com/' .. GITHUB_REPO .. '/releases'
+
+local function getCurrentVersion()
+    local resourceName = GetCurrentResourceName()
+    local version = GetResourceMetadata(resourceName, 'version', 0)
+
+    if not version then
+        version = GetResourceMetadata(resourceName, 'version')
+    end
+
+    return version or '0.0.0'
+end
 
 local function normalizeVersion(version)
     if not version then
         return '0.0.0'
     end
 
-    local normalized = tostring(version):gsub('^v', ''):match('([%d%.]+)')
+    local normalized = tostring(version):gsub('^[vV]', ''):match('([%d%.]+)')
     return normalized or '0.0.0'
 end
 
@@ -55,7 +65,7 @@ local function checkForUpdates()
             end
 
             local latestVersion = normalizeVersion(response.tag_name or response.name)
-            local currentVersion = normalizeVersion(CURRENT_VERSION)
+            local currentVersion = normalizeVersion(getCurrentVersion())
             local releaseUrl = response.html_url or GITHUB_RELEASES_URL
 
             if compareVersions(latestVersion, currentVersion) > 0 then
@@ -66,7 +76,7 @@ local function checkForUpdates()
                 print('^4Download: ^7' .. releaseUrl)
                 print('^2========================================^7')
             else
-                print('^2[character-manager] Up to date (v' .. currentVersion .. ')^7')
+                print('^2[character-manager] Up to date (current: v' .. currentVersion .. ', latest: v' .. latestVersion .. ')^7')
             end
         elseif errorCode == 404 then
             print('^3[character-manager] Update check skipped: no GitHub release found yet^7')
