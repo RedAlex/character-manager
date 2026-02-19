@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wipe Command Menu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="wipe-menu" class="menu-container" style="display: none;">
+        <div class="menu-content">
+            <!-- Header -->
+            <div class="menu-header">
+                <h1 id="menu-title">Wipe Command</h1>
+                <div class="menu-tabs">
+                    <button class="tab-btn active" data-tab="main">
+                        <span id="tab-main">Wipe/Restore</span>
+                    </button>
+                    <button class="tab-btn" data-tab="logs">
+                        <span id="tab-logs">Logs</span>
+                    </button>
+                </div>
+                <button class="close-btn" id="close-menu">&times;</button>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2 id="search-title">Search Player</h2>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label id="label-firstname">Firstname</label>
+                        <input type="text" id="input-firstname" placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label id="label-lastname">Lastname</label>
+                        <input type="text" id="input-lastname" placeholder="Doe">
+                    </div>
+                    <div class="form-group">
+                        <label id="label-phonenumber">Phone Number</label>
+                        <input type="text" id="input-phonenumber" placeholder="555-1234">
+                    </div>
+                    <div class="form-group search-type">
+                        <button class="btn btn-primary" id="search-wipe">
+                            <span id="btn-search-wipe">Search to Wipe</span>
+                        </button>
+                        <button class="btn btn-secondary" id="search-restore">
+                            <span id="btn-search-restore">Search to Restore</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" style="display: none;">
+                <h2 id="results-title">Results</h2>
+                <div class="results-list" id="results-list">
+                    <!-- Dynamic player cards -->
+                </div>
+                <div class="character-actions">
+                    <button class="btn btn-primary" id="next-step-btn" disabled>
+                        <span id="btn-next-step">Next Step</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vehicle Choice Section -->
+            <div class="vehicle-choice-section" style="display: none;">
+                <h2 id="vehicle-choice-title">Vehicle Choice</h2>
+                <p id="vehicle-choice-subtitle">Choose what to do with the player vehicles.</p>
+                <div class="confirm-actions">
+                    <button class="btn btn-success" id="vehicle-choice-transfer-keep">
+                        <span id="btn-vehicle-choice-transfer-keep">Transfer/Keep</span>
+                    </button>
+                    <button class="btn btn-danger" id="vehicle-choice-delete">
+                        <span id="btn-vehicle-choice-delete">Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Transfer Target Section -->
+            <div class="character-section" style="display: none;">
+                <h2 id="character-title">Transfer Vehicles To</h2>
+                <p id="character-subtitle">Search a player by firstname, lastname or phone.</p>
+                <div class="logs-search">
+                    <input type="text" id="transfer-firstname" placeholder="First name...">
+                    <input type="text" id="transfer-lastname" placeholder="Last name...">
+                    <input type="text" id="transfer-phone" placeholder="Phone number...">
+                    <button class="btn btn-primary" id="transfer-search-btn">Search</button>
+                </div>
+                <div class="character-list" id="character-list">
+                    <!-- Dynamic transfer targets -->
+                </div>
+                <div class="character-actions">
+                    <button class="btn btn-secondary" id="cancel-character">
+                        <span id="btn-cancel">Cancel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vehicle Selection Section -->
+            <div class="vehicle-section" style="display: none;">
+                <h2 id="vehicle-title">Select Vehicles to Transfer</h2>
+                <p id="vehicle-subtitle">Only selected vehicles will be transferred.</p>
+                <p id="vehicle-count" class="vehicle-count"></p>
+                <div class="vehicle-list" id="vehicle-list"></div>
+                <div class="character-actions">
+                    <button class="btn btn-secondary" id="cancel-vehicle">
+                        <span id="btn-cancel-vehicle">Cancel</span>
+                    </button>
+                    <button class="btn btn-success" id="vehicle-transfer-target-btn">
+                        <span id="btn-vehicle-transfer-target">Transfer to</span>
+                    </button>
+                    <button class="btn btn-primary" id="vehicle-keep-btn">
+                        <span id="btn-vehicle-keep">Keep</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirmation Section -->
+            <div class="confirmation-section" style="display: none;">
+                <h2 id="confirm-title">Confirm Action</h2>
+                <div class="confirm-details" id="confirm-details">
+                    <!-- Dynamic confirmation details -->
+                </div>
+                <div class="confirm-actions">
+                    <button class="btn btn-danger" id="confirm-action">
+                        <span id="btn-confirm">Confirm</span>
+                    </button>
+                    <button class="btn btn-secondary" id="cancel-action">
+                        <span id="btn-cancel-confirm">Cancel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p id="loading-text">Loading...</p>
+            </div>
+
+            <!-- Logs Section -->
+            <div class="logs-section" style="display: none;">
+                <div class="logs-header">
+                    <h2 id="logs-title">Player Logs</h2>
+                    <div class="logs-search">
+                        <input type="text" id="logs-firstname-input" placeholder="First name...">
+                        <input type="text" id="logs-lastname-input" placeholder="Last name...">
+                        <input type="text" id="logs-phone-input" placeholder="Phone number...">
+                        <button class="btn btn-primary" id="search-logs-btn">
+                            <span id="btn-search-logs">Search</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="logs-container" id="logs-container">
+                    <!-- Dynamic logs will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
