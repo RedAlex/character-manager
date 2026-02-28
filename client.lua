@@ -24,25 +24,15 @@ CreateThread(function()
     end
 end)
 
--- Open Wipe Menu
-RegisterCommand('wipemenu', function()
-    if not HasPermission() then
-        SendNotification(Lang:t("command.no_permission"), 'error')
-        return
-    end
-    OpenWipeMenu()
-end, false)
 
--- Check if player has permission
-function HasPermission()
-    if FrameworkName == 'qb-core' or FrameworkName == 'qbox_core' then
-        return QBCore.Functions.HasPermission(source, Config.Permission)
-    elseif FrameworkName == 'es_extended' then
-        local PlayerData = ESX.GetPlayerData()
-        return PlayerData.group == Config.Permission or PlayerData.group == 'superadmin'
-    end
-    return false
-end
+-- Client listens for server events to open the menu or show notifications.
+RegisterNetEvent('character-manager:client:openMenu', function()
+    OpenWipeMenu()
+end)
+
+RegisterNetEvent('character-manager:client:notify', function(message, type)
+    SendNotification(message, type)
+end)
 
 -- Send notification
 function SendNotification(message, type)

@@ -123,12 +123,26 @@ end
 
 -- Validate player permission
 local function validatePlayerPermission(src)
-    if FrameworkName == 'qb-core' or FrameworkName == 'qbox_core' then
-        return QBCore.Functions.HasPermission(src, Config.Permission)
+    if FrameworkName == 'qb-core' then
+        local Player = QBCore.Functions.GetPlayer(src)
+        if Player then
+            return QBCore.Functions.HasPermission(src, Config.Permission)
+        end
+    elseif FrameworkName == 'qbox_core' then
+        local ok, res = pcall(function()
+            if exports and exports.qbx_core and exports.qbx_core.HasPermission then
+                return exports.qbx_core:HasPermission(src, Config.Permission)
+            end
+            return false
+        end)
+        if ok and res then
+            return true
+        end
     elseif FrameworkName == 'es_extended' then
         local xPlayer = ESX.GetPlayerFromId(src)
-        if not xPlayer then return false end
-        return xPlayer.getGroup() == Config.Permission or xPlayer.getGroup() == 'superadmin'
+        if xPlayer then
+            return xPlayer.getGroup() == Config.Permission
+        end
     end
     return false
 end
@@ -459,6 +473,22 @@ CreateThread(function()
         print('^1[character-manager] Unknown framework: ' .. tostring(framework) .. '^7')
     end
 end)
+
+-- Register server-side command to open the wipe menu. Server enforces ACE via validatePlayerPermission.
+RegisterCommand('wipemenu', function(source, args, raw)
+    if source == 0 then
+        print('^1[character-manager] [SERVER] The wipemenu command cannot be used from console.^7')
+        return
+    end
+
+    if validatePlayerPermission(source) then
+        debugPrint('[character-manager] wipemenu: permission granted for', source)
+        TriggerClientEvent('character-manager:client:openMenu', source)
+    else
+        debugPrint('[character-manager] wipemenu: permission denied for', source)
+        TriggerClientEvent('character-manager:client:notify', source, Lang:t("command.no_permission"), 'error')
+    end
+end, false)
 
 -- ============================================
 -- WEBHOOK LOGGING

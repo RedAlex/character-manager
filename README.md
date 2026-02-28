@@ -57,7 +57,7 @@ FiveM resource to manage characters (wipe / restore) through an admin UI, compat
 
 1. Put `character-manager` inside `resources`
 2. Add `ensure character-manager` to `server.cfg`
-3. Configure `config.lua`
+3. Configure `config.lua` & `config_s.lua`
 4. Restart server
 
 ### Main config (`config.lua`)
@@ -79,7 +79,7 @@ Additional tables can also be skipped automatically by internal patterns (ban/wh
 
 
 **To exclude additional tables:**
-1. Open `config.lua`
+1. Open `config_s.lua`
 2. Add your custom table name to `ExcludedTables` list:
    ```lua
    ExcludedTables = {
@@ -100,7 +100,7 @@ When a wipe or restore action is performed, a Discord embed message is automatic
 **Setup:**
 1. Create a Discord webhook in your server channel: Settings → Integrations → Webhooks
 2. Copy the webhook URL
-3. Paste it in `config.lua` as `WebhookURL`
+3. Paste it in `config_s.lua` as `WebhookURL`
 4. Restart the resource
 
 **Webhook Message includes:**
@@ -202,7 +202,7 @@ Resource FiveM pour gérer les personnages (wipe / restore) via une UI admin, co
 
 1. Place `character-manager` dans `resources`
 2. Ajoute `ensure character-manager` dans `server.cfg`
-3. Configure `config.lua`
+3. Configure `config.lua` & `config_s.lua`
 4. Redémarre le serveur
 
 ### Configuration principale (`config.lua`)
@@ -223,7 +223,7 @@ D'autres tables peuvent aussi etre ignorees automatiquement via les motifs inter
 
 
 **Pour exclure des tables supplémentaires:**
-1. Ouvre `config.lua`
+1. Ouvre `config_s.lua`
 2. Ajoute le nom de ta table personnalisée à la liste `ExcludedTables`:
    ```lua
    ExcludedTables = {
@@ -244,7 +244,7 @@ Quand une action wipe ou restore est effectuée, un message embed Discord est au
 **Configuration:**
 1. Crée un webhook Discord dans ton canal serveur : Settings → Integrations → Webhooks
 2. Copie l'URL du webhook
-3. Colle-la dans `config.lua` comme `WebhookURL`
+3. Colle-la dans `config_s.lua` comme `WebhookURL`
 4. Redémarre la ressource
 
 **Le message webhook contient:**
