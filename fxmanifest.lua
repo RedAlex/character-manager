@@ -7,9 +7,9 @@ version '1.0.1'
 author 'Alex Garcio'
 
 shared_scripts {
-	'locale.lua',
 	'config.lua',
-	'locales/*.lua'
+	'locale.lua',
+	'locales/*.lua',
 }
 
 client_scripts {
@@ -18,11 +18,12 @@ client_scripts {
 
 server_scripts {
 	'@oxmysql/lib/MySQL.lua',
+	'config_s.lua',
 	'utils.lua',
 	'framework.lua',
 	'database.lua',
-    'update.lua',
-    'server.lua',
+	'update.lua',
+	'server.lua',
 }
 
 ui_page 'html/index.html'
