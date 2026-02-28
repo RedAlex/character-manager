@@ -1,9 +1,4 @@
 # character-manager
-
-Version: **1.0.0**
-
----
-
 ## 🇬🇧 English
 
 FiveM resource to manage characters (wipe / restore) through an admin UI, compatible with QBCore, Qbox, and ESX, with optional vehicle transfer during wipe.
@@ -143,9 +138,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-### Licence
-
-Ce projet est distribué sous licence MIT. Consulte le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
@@ -280,3 +272,8 @@ DEF456    | zentorno
 ### Commandes
 
 - `/wipemenu`
+
+
+### Licence
+
+Ce projet est distribué sous licence MIT. Consulte le fichier [LICENSE](LICENSE) pour plus de détails.

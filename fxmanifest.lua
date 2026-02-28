@@ -3,7 +3,7 @@ game 'gta5'
 lua54 'yes'
 
 description 'character-manager'
-version '1.0.1'
+version '1.0.2'
 author 'Alex Garcio'
 
 shared_scripts {
