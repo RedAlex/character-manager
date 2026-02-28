@@ -640,9 +640,40 @@ local function restorePlayerAllTables(idType, idValue, identifierCandidates)
                 -- Check if original table still exists
                 if tableExists(originalTableName) then
                     -- Restore rows to original table
-                    local restoreQuery = string.format('INSERT INTO `%s` SELECT * FROM `%s` WHERE `%s` = ? ON DUPLICATE KEY UPDATE id=id', 
-                        originalTableName, wipedTableName, matchedColumn)
-                    MySQL.query.await(restoreQuery, { matchedValue })
+                    -- Build explicit column list to avoid ambiguous or missing `id` column
+                    local origCols = getTableColumns(originalTableName)
+                    if origCols and #origCols > 0 then
+                        local colNames = {}
+                        for _, c in ipairs(origCols) do
+                            table.insert(colNames, string.format('`%s`', c.COLUMN_NAME))
+                        end
+
+                        local insertColsStr = table.concat(colNames, ',')
+                        local selectColsStr = insertColsStr
+
+                        -- Build update clause using non-PK columns; fall back to first column if none
+                        local updateParts = {}
+                        for _, c in ipairs(origCols) do
+                            if c.COLUMN_KEY ~= 'PRI' then
+                                table.insert(updateParts, string.format('`%s`=VALUES(`%s`)', c.COLUMN_NAME, c.COLUMN_NAME))
+                            end
+                        end
+                        if #updateParts == 0 then
+                            table.insert(updateParts, string.format('`%s`=VALUES(`%s`)', origCols[1].COLUMN_NAME, origCols[1].COLUMN_NAME))
+                        end
+
+                        local updateClause = table.concat(updateParts, ',')
+                        local restoreQuery = string.format(
+                            'INSERT INTO `%s` (%s) SELECT %s FROM `%s` WHERE `%s` = ? ON DUPLICATE KEY UPDATE %s',
+                            originalTableName, insertColsStr, selectColsStr, wipedTableName, matchedColumn, updateClause
+                        )
+
+                        MySQL.query.await(restoreQuery, { matchedValue })
+                    else
+                        -- Fallback: try simple insert-select (may still fail)
+                        local restoreQuery = string.format('INSERT INTO `%s` SELECT * FROM `%s` WHERE `%s` = ?', originalTableName, wipedTableName, matchedColumn)
+                        MySQL.query.await(restoreQuery, { matchedValue })
+                    end
                     
                     debugPrint('^2[character-manager] [DB] ✓ Restored ' .. #backupRows .. ' rows to ' .. originalTableName .. '^7')
                     tablesRestored = tablesRestored + 1
