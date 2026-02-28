@@ -519,8 +519,8 @@ local function wipePlayerAllTables(idType, idValue, extraExcludedTables, identif
                         debugPrint('^3[character-manager] [DB] Created backup table: ' .. wipedTableName .. '^7')
                     end
                     
-                    -- Insert backup rows
-                    local insertQuery = string.format('INSERT INTO `%s` SELECT * FROM `%s` WHERE `%s` = ?', wipedTableName, tableName, matchedColumn)
+                    -- Insert backup rows (ignore duplicates to avoid primary key conflicts)
+                    local insertQuery = string.format('INSERT IGNORE INTO `%s` SELECT * FROM `%s` WHERE `%s` = ?', wipedTableName, tableName, matchedColumn)
                     MySQL.query.await(insertQuery, { matchedValue })
                 end
                 
@@ -668,15 +668,32 @@ local function restorePlayerAllTables(idType, idValue, identifierCandidates)
                             originalTableName, insertColsStr, selectColsStr, wipedTableName, matchedColumn, updateClause
                         )
 
-                        MySQL.query.await(restoreQuery, { matchedValue })
-                    else
-                        -- Fallback: try simple insert-select (may still fail)
-                        local restoreQuery = string.format('INSERT INTO `%s` SELECT * FROM `%s` WHERE `%s` = ?', originalTableName, wipedTableName, matchedColumn)
-                        MySQL.query.await(restoreQuery, { matchedValue })
-                    end
-                    
-                    debugPrint('^2[character-manager] [DB] ✓ Restored ' .. #backupRows .. ' rows to ' .. originalTableName .. '^7')
-                    tablesRestored = tablesRestored + 1
+                        local ok, err = pcall(function()
+                            return MySQL.query.await(restoreQuery, { matchedValue })
+                        end)
+
+                        if ok then
+                            -- Delete restored rows from backup table to avoid duplicate backups
+                            local delQuery = string.format('DELETE FROM `%s` WHERE `%s` = ?', wipedTableName, matchedColumn)
+                            pcall(function() MySQL.query.await(delQuery, { matchedValue }) end)
+                            debugPrint('^2[character-manager] [DB] ✓ Restored ' .. #backupRows .. ' rows to ' .. originalTableName .. ' and deleted backups^7')
+                            tablesRestored = tablesRestored + 1
+                        else
+                            debugPrint('^1[character-manager] [DB] Failed to restore rows to ' .. originalTableName .. ': ' .. tostring(err) .. '^7')
+                        end
+                        else
+                            -- Fallback: try simple insert-select (may still fail)
+                            local restoreQuery = string.format('INSERT INTO `%s` SELECT * FROM `%s` WHERE `%s` = ?', originalTableName, wipedTableName, matchedColumn)
+                            local ok2, err2 = pcall(function() return MySQL.query.await(restoreQuery, { matchedValue }) end)
+                            if ok2 then
+                                local delQuery = string.format('DELETE FROM `%s` WHERE `%s` = ?', wipedTableName, matchedColumn)
+                                pcall(function() MySQL.query.await(delQuery, { matchedValue }) end)
+                                debugPrint('^2[character-manager] [DB] ✓ Restored ' .. #backupRows .. ' rows to ' .. originalTableName .. ' and deleted backups^7')
+                                tablesRestored = tablesRestored + 1
+                            else
+                                debugPrint('^1[character-manager] [DB] Failed to restore rows to ' .. originalTableName .. ': ' .. tostring(err2) .. '^7')
+                            end
+                        end
                 else
                     print('^1[character-manager] [DB] Original table not found: ' .. originalTableName .. '^7')
                 end

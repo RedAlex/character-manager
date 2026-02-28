@@ -180,6 +180,16 @@ local function validateSessionToken(src, token)
     return true
 end
 
+local function logSecurityEvent(src, eventType, details)
+    local logMsg = string.format(
+        '[character-manager] Security Event - Source: %d | Type: %s | Details: %s',
+        src,
+        eventType,
+        json.encode(details or {})
+    )
+    print('^1' .. logMsg .. '^7')
+end
+
 -- Check rate limiting
 local function checkRateLimit(src)
     local now = os.time() * 1000
@@ -210,16 +220,7 @@ local function checkRateLimit(src)
     return true
 end
 
--- Log security events
-local function logSecurityEvent(src, eventType, details)
-    local logMsg = string.format(
-        '[character-manager] Security Event - Source: %d | Type: %s | Details: %s',
-        src,
-        eventType,
-        json.encode(details or {})
-    )
-    print('^1' .. logMsg .. '^7')
-end
+ 
 
 -- Validate callback data
 local function validateCallbackData(src, dataType, data)
