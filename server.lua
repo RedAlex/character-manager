@@ -531,7 +531,7 @@ function sendWebhook(logData)
 
     PerformHttpRequest(Config.WebhookURL, function(errorCode, resultData, resultHeaders)
         if errorCode ~= 204 then
-            print('^3[character-manager] [WEBHOOK] Failed to send webhook (error: ' .. errorCode .. ')^7')
+            debugPrint('^3[character-manager] [WEBHOOK] Failed to send webhook (error: ' .. errorCode .. ')^7')
         end
     end, 'POST', json.encode(payload), {['Content-Type'] = 'application/json'})
 end

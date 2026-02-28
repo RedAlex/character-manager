@@ -5,6 +5,7 @@ Config = {
     SafeWipeMode    = true,     -- true = backup to wiped_* before delete, false = direct delete without backup
     EnableUpdateCheck = true,   -- Check GitHub releases on resource start
     WebhookURL      = '',       -- Discord webhook URL for logging (leave empty to disable)
+    DebugMode       = false,    -- Enable debug mode for additional logging
     
     -- Tables to exclude from wipe/restore operations (optional manual additions)
     -- Add custom tables here if you want to exclude them from wipe/restore

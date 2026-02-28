@@ -65,14 +65,14 @@ local function detectPhoneSource()
                     number_col = pattern.number_col,
                     id_col = pattern.id_col
                 }
-                print(string.format('^2[character-manager] Phone source detected: %s.%s (indexed by %s)^7', 
+                debugPrint(string.format('^2[character-manager] Phone source detected: %s.%s (indexed by %s)^7', 
                     pattern.table, pattern.number_col, pattern.id_col))
                 return
             end
         end
     end
     
-    print('^3[character-manager] No phone table found - phone search will be disabled^7')
+    debugPrint('^3[character-manager] No phone table found - phone search will be disabled^7')
 end
 
 -- Get phone number for a player (used in search)
@@ -260,7 +260,7 @@ local function validateIdentifierColumn(tableName, columnName)
     end)
     
     if not success then
-        print(string.format('^3[character-manager] Warning: Failed to validate table %s column %s: %s^7', tableName, columnName, tostring(result)))
+        debugPrint(string.format('^3[character-manager] Warning: Failed to validate table %s column %s: %s^7', tableName, columnName, tostring(result)))
         return false
     end
     
@@ -310,7 +310,7 @@ local function getTablesToBackup()
     end
     
     -- Fallback if nothing is found
-    print('[character-manager] Warning: No tables with identifiers found')
+    debugPrint('[character-manager] Warning: No tables with identifiers found')
     return {}
 end
 
@@ -396,9 +396,9 @@ end
 
 -- Wipe player from all tables in database (except excluded ones)
 local function wipePlayerAllTables(idType, idValue, extraExcludedTables, identifierCandidates)
-    print('^3[character-manager] [DB] Wiping player from all tables: idType=' .. idType .. ', idValue=' .. idValue .. '^7')
+    debugPrint('^3[character-manager] [DB] Wiping player from all tables: idType=' .. idType .. ', idValue=' .. idValue .. '^7')
     local safeMode = Config.SafeWipeMode ~= false
-    print('^3[character-manager] [DB] SafeWipeMode=' .. tostring(safeMode) .. '^7')
+    debugPrint('^3[character-manager] [DB] SafeWipeMode=' .. tostring(safeMode) .. '^7')
 
     local candidateValues = {}
     if type(idType) == 'string' and idType ~= '' and idValue ~= nil and tostring(idValue) ~= '' then
@@ -502,8 +502,8 @@ local function wipePlayerAllTables(idType, idValue, extraExcludedTables, identif
             end
         end
         
-        if matchedColumn and matchedValue then
-            print('^3[character-manager] [DB] Found ' .. matchedColumn .. ' in table ' .. tableName .. '^7')
+            if matchedColumn and matchedValue then
+            debugPrint('^3[character-manager] [DB] Found ' .. matchedColumn .. ' in table ' .. tableName .. '^7')
             
             -- Get all rows for this player
             local query = string.format('SELECT * FROM `%s` WHERE `%s` = ?', tableName, matchedColumn)
@@ -516,7 +516,7 @@ local function wipePlayerAllTables(idType, idValue, extraExcludedTables, identif
                     if not tableExists(wipedTableName) then
                         local cloneQuery = string.format('CREATE TABLE IF NOT EXISTS `%s` LIKE `%s`', wipedTableName, tableName)
                         MySQL.query.await(cloneQuery)
-                        print('^3[character-manager] [DB] Created backup table: ' .. wipedTableName .. '^7')
+                        debugPrint('^3[character-manager] [DB] Created backup table: ' .. wipedTableName .. '^7')
                     end
                     
                     -- Insert backup rows
@@ -528,7 +528,7 @@ local function wipePlayerAllTables(idType, idValue, extraExcludedTables, identif
                 local deleteQuery = string.format('DELETE FROM `%s` WHERE `%s` = ?', tableName, matchedColumn)
                 MySQL.query.await(deleteQuery, { matchedValue })
                 
-                print('^2[character-manager] [DB] ✓ Wiped ' .. #playerRows .. ' rows from ' .. tableName .. '^7')
+                debugPrint('^2[character-manager] [DB] ✓ Wiped ' .. #playerRows .. ' rows from ' .. tableName .. '^7')
                 tablesModified = tablesModified + 1
             end
         end
@@ -536,13 +536,13 @@ local function wipePlayerAllTables(idType, idValue, extraExcludedTables, identif
         ::continue::
     end
     
-    print('^2[character-manager] [DB] Wipe complete: ' .. tablesModified .. ' tables modified^7')
+    debugPrint('^2[character-manager] [DB] Wipe complete: ' .. tablesModified .. ' tables modified^7')
     return tablesModified
 end
 
 -- Restore player to all backup tables (except excluded ones)
 local function restorePlayerAllTables(idType, idValue, identifierCandidates)
-    print('^3[character-manager] [DB] Restoring player from all backup tables: idType=' .. idType .. ', idValue=' .. idValue .. '^7')
+    debugPrint('^3[character-manager] [DB] Restoring player from all backup tables: idType=' .. idType .. ', idValue=' .. idValue .. '^7')
     if Config.SafeWipeMode == false then
         print('^1[character-manager] [DB] Restore skipped: SafeWipeMode=false (no backups available)^7')
         return 0
@@ -644,7 +644,7 @@ local function restorePlayerAllTables(idType, idValue, identifierCandidates)
                         originalTableName, wipedTableName, matchedColumn)
                     MySQL.query.await(restoreQuery, { matchedValue })
                     
-                    print('^2[character-manager] [DB] ✓ Restored ' .. #backupRows .. ' rows to ' .. originalTableName .. '^7')
+                    debugPrint('^2[character-manager] [DB] ✓ Restored ' .. #backupRows .. ' rows to ' .. originalTableName .. '^7')
                     tablesRestored = tablesRestored + 1
                 else
                     print('^1[character-manager] [DB] Original table not found: ' .. originalTableName .. '^7')
@@ -655,7 +655,7 @@ local function restorePlayerAllTables(idType, idValue, identifierCandidates)
         ::continue::
     end
     
-    print('^2[character-manager] [DB] Restore complete: ' .. tablesRestored .. ' tables processed^7')
+    debugPrint('^2[character-manager] [DB] Restore complete: ' .. tablesRestored .. ' tables processed^7')
     return tablesRestored
 end
 
